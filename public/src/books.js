@@ -20,18 +20,32 @@ function partitionBooksByBorrowedStatus(books) {
   return [checkedOutBooks, returnedBooks];
 }
 
-function getBorrowersForBook(book, accounts) {
-  const { borrows } = book;
+// Helper function
+function findAccountsByIds(accountIds, accounts) {
   const result = [];
 
-  for (let i = 0; i < borrows.length && result.length < 10; i++) {
-    const borrow = borrows[i];
-    const account = accounts.find((account) => account.id === borrow.id);
-    result.push({ ...account, returned: borrow.returned });
-  }
+  accountIds.forEach((accountId) => {
+    const account = accounts.find((account) => account.id === accountId);
+    if (account) {
+      result.push(account);
+    }
+  });
 
   return result;
 }
+
+function getBorrowersForBook(book, accounts) {
+  const { borrows } = book;
+  const accountIds = borrows.map((borrow) => borrow.id);
+  const borrowers = findAccountsByIds(accountIds, accounts);
+  
+  borrowers.forEach((borrower, index) => {
+    borrower.returned = borrows[index].returned;
+  });
+
+  return borrowers.slice(0, 10); // Return up to 10 borrowers
+}
+
 
 module.exports = {
   findAuthorById,
