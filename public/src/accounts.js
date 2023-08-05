@@ -29,7 +29,17 @@ function getTotalNumberOfBorrows(account, books) {
 }
 
 function getBooksPossessedByAccount(account, books, authors) {
+  const checkedOutBooks = books.filter(book => {
+    const lastBorrow = book.borrows[0];
+    return !lastBorrow.returned && lastBorrow.id === account.id;
+  });
 
+  checkedOutBooks.forEach(book => {
+    const author = authors.find(author => author.id === book.authorId)
+    book.author = author;
+  });
+
+  return checkedOutBooks;
 }
 
 module.exports = {
